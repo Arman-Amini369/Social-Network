@@ -8,5 +8,15 @@
 
 {% block content %}
     <h3 class="text-center">{{user.username}}</h3>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Posts</h5>
+            <hr/><hr/>
+            {% for post in posts %}
+               <a href="{{post.get_absolute_url}}" class="card-body" style="font-size: 30px;">{{post.title}}</a>
+               <hr />
+            {% endfor %}
+        </div>
+    </div>
 {% endblock content %}
     

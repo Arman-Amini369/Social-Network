@@ -7,6 +7,16 @@
     
 
 {% block content %}
-    <h1>Hello...</h1>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Posts</h5>
+            <hr/><hr/>
+            {% for post in posts %}
+               <a href="{{ post.get_absolute_url }}" class="card-body" style="font-size: 30px;">{{ post.title }}</a>
+               <hr />
+               <!-- We can also user <a href="" class="card-body">{{post.body|truncatewords:9}}</a> and it will add ... after the 8 words-->
+            {% endfor %}
+        </div>
+    </div>
 {% endblock content %}
     

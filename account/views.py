@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from home.models import Post
 
 class UserRegisterView(View):
     form_class = UserRegistrationForm
@@ -79,7 +79,12 @@ class UserLogoutView(LoginRequiredMixin, View):
         return redirect("home:home")
 
 
-class UserProfileVIew(LoginRequiredMixin, View):
+class UserProfileVIew(View):
     def get(self, request, user_id):
         user = User.objects.get(pk=user_id)
-        return render(request, "account/user_profile.html", {"user" : user})
+        posts = Post.objects.filter(user=user)
+        context = {
+            "user" : user,
+            "posts" : posts,
+        }
+        return render(request, "account/user_profile.html", context)
