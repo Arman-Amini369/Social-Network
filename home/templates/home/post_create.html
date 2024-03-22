@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    <title>Create New Post</title>    
+{% endblock title %}
+
+
+{% block content %}
+    <form action="" method="post" novalidate>
+        {% csrf_token %}
+        {{form.as_p}}
+        <input type="submit" class="btn btn-outline-primary"+ value="Create">
+    </form>
+{% endblock content %}
+    
+    

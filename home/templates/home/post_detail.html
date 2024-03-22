@@ -18,6 +18,9 @@
             <hr />
             <h3>Delete This Post</h3>
             <a href="{% url 'home:post_delete' post.pk post.slug %}" class="btn btn-danger">Delete</a>
+            <hr />
+            <h3>Update This Post</h3>
+            <a href="{% url 'home:post_update' post.pk post.slug %}" class="btn btn-info">Update</a>
             <br />
             {% endif %}
             <hr/>

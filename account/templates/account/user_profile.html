@@ -10,6 +10,9 @@
     <h3 class="text-center">{{user.username}}</h3>
     <div class="card">
         <div class="card-body">
+            {% if request.user.pk == user.pk %}
+            <a href="{% url 'home:post_create' %}" class="btn btn-outline-info">Create New Post</a><br /><br />
+            {% endif %}
             <h5 class="card-title">Posts</h5>
             <hr/><hr/>
             {% for post in posts %}
