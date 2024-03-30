@@ -84,7 +84,7 @@ class UserLogoutView(LoginRequiredMixin, View):
 class UserProfileVIew(View):
     def get(self, request, user_id):
         user = get_object_or_404(User, pk=user_id)
-        posts = Post.objects.filter(user=user)
+        posts = user.posts.all()
         context = {
             "user" : user,
             "posts" : posts,
