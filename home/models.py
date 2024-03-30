@@ -12,7 +12,7 @@ class Post(models.Model):
 
 
     class Meta:
-        ordering = ["-updated"]
+        ordering = ["-updated", "-created"]
     
 
     def __str__(self):
