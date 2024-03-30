@@ -1,11 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
+from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.utils.text import slugify
 from django.contrib.auth import views as auth_views
 from .models import Post
 from .forms import PostCreateUpdateForm
+
 
 
 class HomeView(View):
@@ -97,3 +99,4 @@ class PostCreateView(LoginRequiredMixin, View):
             new_post.save()
             messages.success(request, "Your New Post Has Been Created Successfully", "success")
             return redirect("home:post_detail", new_post.pk, new_post.slug)
+        
