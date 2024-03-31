@@ -28,4 +28,29 @@
                 {{ post.body }}
             </h4>
                 </div>
+        <hr />
+    </div><br />
+    {% if request.user.is_authenticated %}
+    <h2>New Comment Form</h2>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" class="btn btn-outline-primary" value="Comment">
+    </form><hr />
+    {% else %}
+    <h2 class="alert alert-danger">Login to comment</h2>
+    {% endif %}
+
+    {% for comment in comments %}
+    <div class="card bg-dark text-white">
+        <p class="card-header">
+            {{ comment.user }} | {{ comment.created.date }} | {{ comment.created.time }} | {{comment.created|timesince}} ago
+        </p>
+        <p class="card-body">
+            {{ comment.body }}
+        </p>
+    </div><br />
+    {% empty %}
+    <p class="alert alert-danger">No Comments Yet!</p><br />
+    {% endfor %}
 {% endblock content %}
