@@ -13,6 +13,11 @@
             {% if request.user.pk == user.pk %}
             <a href="{% url 'home:post_create' %}" class="btn btn-outline-info">Create New Post</a><br /><br />
             {% endif %}
+            {% if request.user.pk != user.pk and not is_following %}
+                <a href="{% url 'account:user_follow' user.pk %}" class="btn btn-primary">Follow</a><hr />
+            {% elif request.user.pk != user.pk and is_following %}
+                <a href="{% url 'account:user_unfollow' user.pk %}" class="btn btn-primary">Unfollow</a><hr />
+            {% endif %}
             <h5 class="card-title">Posts</h5>
             <hr/><hr/>
             {% for post in posts %}
