@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.utils.text import slugify
 from django.contrib.auth import views as auth_views
 from .models import Post, Comment
-from .forms import PostCreateUpdateForm, CommentCreateReplyForm
+from .forms import PostCreateUpdateForm, CommentReplyCreateUpdateForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
@@ -22,7 +22,7 @@ class HomeView(View):
     
 
 class PostDetailView(View):
-    form_class = CommentCreateReplyForm
+    form_class = CommentReplyCreateUpdateForm
 
     def setup(self, request, *args, **kwargs):
         self.post_instance = get_object_or_404(Post, pk=kwargs["post_id"], slug=kwargs["post_slug"])
@@ -123,8 +123,50 @@ class PostCreateView(LoginRequiredMixin, View):
             return redirect("home:post_detail", new_post.pk, new_post.slug)
 
 
+class CommentUpdateView(LoginRequiredMixin, View):
+    form_class = CommentReplyCreateUpdateForm
+    template_name = "home/comment_update.html"
+
+    def get(self, request, comment_id):
+        comment = get_object_or_404(Comment, pk=comment_id)
+        form = self.form_class(instance=comment)
+        context = {
+            "form" : form,
+        }
+        return render(request, self.template_name, context)
+    
+    def post(self, request, comment_id):
+        comment = get_object_or_404(Comment, pk=comment_id)
+        form = self.form_class(request.POST, instance=comment)
+        if form.is_valid():
+            new_comment = form.save(commit=False)
+            new_comment.user = request.user
+            new_comment.post = comment.post
+            new_comment.save()
+            messages.success(request, "Your comment Has Been Updated Successfully", "success")
+            return redirect("home:post_detail", post_id=comment.post.pk, post_slug=comment.post.slug)
+        context = {
+            "form" : "form",
+        }
+        return render(request, self.template_name, context)
+
+
+class CommentDeleteView(LoginRequiredMixin, View):
+    def get(self, request, comment_id):
+        comment = get_object_or_404(Comment, pk=comment_id)
+        if comment.user.pk == request.user.pk:
+            comment.delete()
+            messages.success(request, "Your Comment Has Been Deleted Successfully", "success")
+            return redirect("home:post_detail", post_id=comment.post.pk, post_slug=comment.post.slug)
+
+        else:
+            messages.error(request, "You Are Not Authorized To Delete This Comment", "danger")
+            return redirect("home:post_detail", post_id=comment.post.pk, post_slug=comment.post.slug)
+
+
+
 class ReplyAddView(LoginRequiredMixin, View):
-    form_class = CommentCreateReplyForm
+    form_class = CommentReplyCreateUpdateForm
 
     def post(self, request, post_id, comment_id):
         form = self.form_class(request.POST)

@@ -42,6 +42,10 @@
     {% endif %}
 
     {% for comment in comments %}
+    {% if comment.user.pk == request.user.pk %}
+        <a href="{% url 'home:comment_delete' comment.pk %}" class="btn btn-danger">Delete Comment</a>
+        <a href="{% url 'home:comment_update' comment.pk %}" class="btn btn-info">Update Comment</a>
+    {% endif %}
     <div class="card bg-dark text-white">
         <p class="card-header">
             {{ comment.user }} | {{ comment.created.date }} | {{ comment.created.time }} | {{comment.created|timesince}} ago
