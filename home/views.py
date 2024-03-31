@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.utils.text import slugify
 from django.contrib.auth import views as auth_views
-from .models import Post, Comment
+from .models import Post, Comment, Vote
 from .forms import PostCreateUpdateForm, CommentReplyCreateUpdateForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
@@ -30,11 +30,15 @@ class PostDetailView(View):
 
     def get(self, request, post_id, post_slug):
         comments = self.post_instance.pcomments.filter(is_reply=False)
+        can_unlike = False
+        if request.user.is_authenticated and self.post_instance.user_unlike(request.user):
+            can_unlike = True
         context = {
         "post": self.post_instance,
         "comments": comments,
         "form" : self.form_class,
         "reply_form" : self.form_class,
+        "can_unlike" : can_unlike,
         }
         return render(request, "home/post_detail.html", context)
     
@@ -180,4 +184,28 @@ class ReplyAddView(LoginRequiredMixin, View):
             new_reply.is_reply = True
             new_reply.save()
             messages.success(request, "Your New Reply Has Been Added Successfully", "success")
+        return redirect("home:post_detail", post_id=post.pk, post_slug=post.slug)
+
+
+class PostLikeView(LoginRequiredMixin, View):
+    def get(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        like = Vote.objects.filter(user=request.user, post=post)
+        if like.exists():
+            messages.error(request, "You have already liked this post", "danger")
+        else:
+            Vote.objects.create(user=request.user, post=post)
+            messages.success(request, "You have liked this post", "success")
+        return redirect("home:post_detail", post_id=post.pk, post_slug=post.slug)
+
+
+class PostUnlikeView(LoginRequiredMixin, View):
+    def get(self, request, post_id):
+        post = get_object_or_404(Post, pk=post_id)
+        like = Vote.objects.filter(user=request.user, post=post)
+        if not like.exists():
+            messages.error(request, "You have not liked this post", "danger")
+        else:
+            like.delete()
+            messages.success(request, "You have unliked this post", "success")
         return redirect("home:post_detail", post_id=post.pk, post_slug=post.slug)

@@ -31,6 +31,13 @@
         <hr />
     </div><br />
     {% if request.user.is_authenticated %}
+    {% if can_unlike %}
+        <a href="{% url 'home:post_unlike' post.pk %}" class="btn btn-primary col-md-2">Unlike</a><br /><br />
+    {% else %}
+        <a href="{% url 'home:post_like' post.pk %}" class="btn btn-primary col-md-2">Like</a><br /><br />
+    {% endif %}
+    <h3>Number of likes : {{post.likes_count}}</h3>
+    <hr />
     <h2>New Comment Form</h2>
     <form action="" method="post">
         {% csrf_token %}

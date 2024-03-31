@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Comment
+from .models import Post, Comment, Vote
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
@@ -16,3 +16,6 @@ class CommentAdmin(admin.ModelAdmin):
     list_filter = ("user", "created", "post", "created")
     search_fields = ("user", "body", "post", "is_reply")
     raw_id_fields = ("user", "post", "reply")
+
+
+admin.site.register(Vote)
