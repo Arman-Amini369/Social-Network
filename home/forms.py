@@ -7,7 +7,7 @@ class PostCreateUpdateForm(forms.ModelForm):
         fields = ("title", "body")
     
 
-class CommentCreateForm(forms.ModelForm):
+class CommentCreateReplyForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ("body",)

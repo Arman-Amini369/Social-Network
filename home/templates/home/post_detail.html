@@ -48,7 +48,24 @@
         </p>
         <p class="card-body">
             {{ comment.body }}
-        </p>
+        </p><hr />
+        <h2>Add Reply Form</h2>
+        <form action="{% url 'home:reply_add' post.id comment.id %}" method="post" class="p-2 m-2">
+            {% csrf_token %}
+            {{ reply_form.as_p }}
+            <input type="submit" class="btn btn-outline-primary" value="Reply">
+        </form><br />
+        {% with replies=comment.rcomments.all %}
+        {% for reply in replies %}
+            <div class="card bg-dark text-white">
+                <p class="bg-primary p-3 m-2 ">
+                    {{ reply.user }} | {{ reply.created.date }} | {{ reply.created.time }} | {{reply.created|timesince}} ago
+                    <br /><br />
+                    {{ reply.body }}
+                </p>
+            </div>
+        {% endfor %}
+        {% endwith %}
     </div><br />
     {% empty %}
     <p class="alert alert-danger">No Comments Yet!</p><br />

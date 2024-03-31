@@ -5,8 +5,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.utils.text import slugify
 from django.contrib.auth import views as auth_views
-from .models import Post
-from .forms import PostCreateUpdateForm, CommentCreateForm
+from .models import Post, Comment
+from .forms import PostCreateUpdateForm, CommentCreateReplyForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
@@ -22,7 +22,7 @@ class HomeView(View):
     
 
 class PostDetailView(View):
-    form_class = CommentCreateForm
+    form_class = CommentCreateReplyForm
 
     def setup(self, request, *args, **kwargs):
         self.post_instance = get_object_or_404(Post, pk=kwargs["post_id"], slug=kwargs["post_slug"])
@@ -33,7 +33,8 @@ class PostDetailView(View):
         context = {
         "post": self.post_instance,
         "comments": comments,
-        "form" : self.form_class,   
+        "form" : self.form_class,
+        "reply_form" : self.form_class,
         }
         return render(request, "home/post_detail.html", context)
     
@@ -120,4 +121,21 @@ class PostCreateView(LoginRequiredMixin, View):
             new_post.save()
             messages.success(request, "Your New Post Has Been Created Successfully", "success")
             return redirect("home:post_detail", new_post.pk, new_post.slug)
-        
+
+
+class ReplyAddView(LoginRequiredMixin, View):
+    form_class = CommentCreateReplyForm
+
+    def post(self, request, post_id, comment_id):
+        form = self.form_class(request.POST)
+        post = get_object_or_404(Post, pk=post_id)
+        comment = get_object_or_404(Comment, pk=comment_id)
+        if form.is_valid():
+            new_reply = form.save(commit=False)
+            new_reply.user = request.user
+            new_reply.post = post
+            new_reply.reply = comment
+            new_reply.is_reply = True
+            new_reply.save()
+            messages.success(request, "Your New Reply Has Been Added Successfully", "success")
+        return redirect("home:post_detail", post_id=post.pk, post_slug=post.slug)
