@@ -44,6 +44,10 @@ class UserLoginView(View):
     form_class = UserLoginForm
     template_name = "account/user_login.html"
 
+    def setup(self, request, *args, **kwargs):
+        self.next = request.GET.get("next")
+        return super().setup(request, *args, **kwargs)
+
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect("home:home")
@@ -64,6 +68,8 @@ class UserLoginView(View):
             if user is not None:
                 login(request, user)
                 messages.success(request, "You Logged In Successfully", "success")
+                if self.next:
+                    return redirect(self.next)
                 return redirect("account:user_profile", user.id)
             else:
                 messages.error(request, "Wrong Username or Password", "danger")
@@ -83,7 +89,7 @@ class UserLogoutView(LoginRequiredMixin, View):
         return redirect("home:home")
 
 
-class UserProfileVIew(View):
+class UserProfileVIew(LoginRequiredMixin, View):
     def get(self, request, user_id):
         is_following = False
         user = get_object_or_404(User, pk=user_id)
