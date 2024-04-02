@@ -4,20 +4,26 @@
 {% block title %}
     <title>Home Page | Social Network</title>
 {% endblock title %}
-    
+
 
 {% block content %}
+    <form action="" method="get">
+    {{ form.as_p }}
+    <input type="submit" class="btn btn-outline-primary" value="Search">
+    </form>
+    <br />
+    <br />
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Posts</h5>
             <h5 class="alert alert-info">For creating new post, you should go on your profile page and create</h5>
             <hr/><hr/>
-            {% for post in posts %}
-               <a href="{{ post.get_absolute_url }}" class="card-body" style="font-size: 30px;">{{ post.title }}</a>
-               <hr />
-               <!-- We can also user <a href="" class="card-body">{{post.body|truncatewords:9}}</a> and it will add ... after the 8 words-->
-            {% endfor %}
+                {% for post in posts %}
+                   <a href="{{ post.get_absolute_url }}" class="card-body" style="font-size: 30px;">{{ post.title }}</a>
+                   <hr />
+                   <!-- We can also use <a href="" class="card-body">{{post.body|truncatewords:9}}</a> and it will add ...
+                    after the 8 words-->
+                {% endfor %}
         </div>
     </div>
 {% endblock content %}
-    

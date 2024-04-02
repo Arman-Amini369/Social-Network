@@ -1,25 +1,28 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.http import HttpResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
 from django.utils.text import slugify
-from django.contrib.auth import views as auth_views
 from .models import Post, Comment, Vote
-from .forms import PostCreateUpdateForm, CommentReplyCreateUpdateForm
+from .forms import PostCreateUpdateForm, CommentReplyCreateUpdateForm, PostSearchForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
 
-
 class HomeView(View):
+    form_class = PostSearchForm
+
     def get(self, request):
+        form = self.form_class(request.GET)
         posts = Post.objects.all()
+        if request.GET.get("search"):
+            posts = posts.filter(title__icontains=request.GET["search"])
         context = {
         "posts": posts,
+        "form": form,
         }
         return render(request, "home/index.html", context)
-    
+
 
 class PostDetailView(View):
     form_class = CommentReplyCreateUpdateForm
@@ -36,12 +39,12 @@ class PostDetailView(View):
         context = {
         "post": self.post_instance,
         "comments": comments,
-        "form" : self.form_class,
-        "reply_form" : self.form_class,
-        "can_unlike" : can_unlike,
+        "form": self.form_class,
+        "reply_form": self.form_class,
+        "can_unlike": can_unlike,
         }
         return render(request, "home/post_detail.html", context)
-    
+
     @method_decorator(login_required(login_url="account:user_login"))
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -52,7 +55,7 @@ class PostDetailView(View):
             new_comment.save()
             messages.success(request, "Your Comment Has Been Saved Successfully", "success")
             return redirect("home:post_detail", post_id=self.post_instance.pk, post_slug=self.post_instance.slug)
-    
+
 
 class PostDeleteView(LoginRequiredMixin, View):
     def get(self, request, post_id, post_slug):
@@ -82,7 +85,7 @@ class PostUpdateView(LoginRequiredMixin, View):
             messages.error(request, "You Are Not Authorized To Update This Post", "danger")
             return redirect("home:home")
         return super().dispatch(request, *args, **kwargs)
-    
+
     def get(self, request, *args, **kwargs):
         post = self.post_instance
         form = self.form_class(instance=post)
@@ -90,7 +93,7 @@ class PostUpdateView(LoginRequiredMixin, View):
             "form" : form,
         }
         return render(request, self.template_name, context)
-    
+
     def post(self, request, *args, **kwargs):
         post = self.post_instance
         form = self.form_class(request.POST, instance=post)
@@ -104,7 +107,7 @@ class PostUpdateView(LoginRequiredMixin, View):
             "form" : "form",
         }
         return render(request, self.template_name, context)
-    
+
 
 class PostCreateView(LoginRequiredMixin, View):
     form_class = PostCreateUpdateForm
@@ -115,7 +118,7 @@ class PostCreateView(LoginRequiredMixin, View):
             "form" : form,
         }
         return render(request, "home/post_create.html", context)
-    
+
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
@@ -135,10 +138,10 @@ class CommentUpdateView(LoginRequiredMixin, View):
         comment = get_object_or_404(Comment, pk=comment_id)
         form = self.form_class(instance=comment)
         context = {
-            "form" : form,
+            "form": form,
         }
         return render(request, self.template_name, context)
-    
+
     def post(self, request, comment_id):
         comment = get_object_or_404(Comment, pk=comment_id)
         form = self.form_class(request.POST, instance=comment)
@@ -150,7 +153,7 @@ class CommentUpdateView(LoginRequiredMixin, View):
             messages.success(request, "Your comment Has Been Updated Successfully", "success")
             return redirect("home:post_detail", post_id=comment.post.pk, post_slug=comment.post.slug)
         context = {
-            "form" : "form",
+            "form": "form",
         }
         return render(request, self.template_name, context)
 
@@ -166,7 +169,6 @@ class CommentDeleteView(LoginRequiredMixin, View):
         else:
             messages.error(request, "You Are Not Authorized To Delete This Comment", "danger")
             return redirect("home:post_detail", post_id=comment.post.pk, post_slug=comment.post.slug)
-
 
 
 class ReplyAddView(LoginRequiredMixin, View):
