@@ -6,6 +6,7 @@
 {% endblock title %}
 
 {% block content %}
+
     <div class="card">
         <div class="card-body">
             <h2 class="card-title">Author :<a href="{% url 'account:user_profile' post.user.id %}"> {{ post.user.username }}</a></h2>
@@ -32,6 +33,7 @@
     </div><br />
     {% if request.user.is_authenticated %}
     {% if can_unlike %}
+    
         <a href="{% url 'home:post_unlike' post.pk %}" class="btn btn-primary col-md-2">Unlike</a><br /><br />
     {% else %}
         <a href="{% url 'home:post_like' post.pk %}" class="btn btn-primary col-md-2">Like</a><br /><br />
@@ -79,6 +81,7 @@
         {% endwith %}
     </div><br />
     {% empty %}
+
     <p class="alert alert-danger">No Comments Yet!</p><br />
     {% endfor %}
 {% endblock content %}
