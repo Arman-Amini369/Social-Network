@@ -11,7 +11,9 @@
     <div class="card">
         <div class="card-body">
             {% if request.user.pk == user.pk %}
-            <a href="{% url 'home:post_create' %}" class="btn btn-outline-info">Create New Post</a><br /><br />
+            <a href="{% url 'home:post_create' %}" class="btn btn-outline-info">Create New Post</a>
+            <a href="{% url 'account:edit_profile' %}" class="btn btn-outline-primary">Edit Your Profile</a>
+            <br /><br />
             {% endif %}
             {% if request.user.pk != user.pk and not is_following %}
                 <a href="{% url 'account:user_follow' user.pk %}" class="btn btn-primary">Follow</a><hr />
