@@ -33,15 +33,15 @@ class PostDetailView(View):
 
     def get(self, request, post_id, post_slug):
         comments = self.post_instance.pcomments.filter(is_reply=False)
-        can_unlike = False
-        if request.user.is_authenticated and self.post_instance.user_unlike(request.user):
-            can_unlike = True
+        user_can_like = True
+        if request.user.is_authenticated and self.post_instance.can_like(request.user):
+            user_can_like = False
         context = {
         "post": self.post_instance,
         "comments": comments,
         "form": self.form_class,
         "reply_form": self.form_class,
-        "can_unlike": can_unlike,
+        "user_can_like": user_can_like,
         }
         return render(request, "home/post_detail.html", context)
 

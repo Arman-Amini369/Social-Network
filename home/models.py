@@ -23,7 +23,7 @@ class Post(models.Model):
     def likes_count(self):
         return self.pvotes.count()
 
-    def user_unlike(self, user):
+    def can_like(self, user):
         user_like = user.uvotes.filter(post=self)
         if user_like.exists():
             return True

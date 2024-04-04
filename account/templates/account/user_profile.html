@@ -15,6 +15,9 @@
             <a href="{% url 'account:edit_profile' %}" class="btn btn-outline-primary">Edit Your Profile</a>
             <br /><br />
             {% endif %}
+            <h3>Age : {{user.profile.age}}</h3> <br />
+            <h3>Bio : {{user.profile.bio}}</h3> <br />
+            <hr />
             {% if request.user.pk != user.pk and not is_following %}
                 <a href="{% url 'account:user_follow' user.pk %}" class="btn btn-primary">Follow</a><hr />
             {% elif request.user.pk != user.pk and is_following %}
